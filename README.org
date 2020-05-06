@@ -34,4 +34,4 @@ $ ruby convert_manual.rb v0.82.0
 
 It will work with commit id or branch name too, even if it's not really
 necessarily. Because of a small internal trick, it won't work with
-branch, which name contains a `v`. However, you should always use tags.
+branch, which name contains a ~v~. However, you should always use tags.
