@@ -1,0 +1,37 @@
+#+title: Convert RuboCop documentation to Dash
+
+This repository contains a ruby script allowing one to convert the
+RuboCop manual for a given tag to a [[https://kapeli.com/dash][Dash]] compatible docset.
+
+* Dependencies
+
+This script support modern rubies (> 2.5) and requires:
+
+- kramdown
+- kramdown-parser-gfm
+- nokogiri
+- rouge
+- sqlite3
+
+#+begin_src sh
+$ gem install bundler
+$ bundle install
+#+end_src
+
+* How to use it
+
+Just call the script with a git tag reference:
+
+#+begin_src sh
+$ ruby convert_manual.rb <TAG>
+#+end_src
+
+For exemple:
+
+#+begin_src sh
+$ ruby convert_manual.rb v0.82.0
+#+end_src
+
+It will work with commit id or branch name too, even if it's not really
+necessarily. Because of a small internal trick, it won't work with
+branch, which name contains a `v`. However, you should always use tags.
