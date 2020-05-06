@@ -272,6 +272,28 @@ puts '>> Add supplementary settings from configuration.html'
   )
 end
 
+dash_root = 'Dash-User-Contributions/docsets/RuboCop'
+exit unless Dir.exist? dash_root
+
 puts '>> Generating tarball'
 system('tar', '-C', '_output', '--exclude', '.DS_Store', '-czf',
-       '_output/RuboCop.tgz', 'RuboCop.docset')
+       dash_root + '/RuboCop.tgz', 'RuboCop.docset')
+
+puts '>> Write docset.json file'
+meta = <<~META
+  {
+    "name": "RuboCop",
+    "version": "#{version}",
+    "archive": "RuboCop.tgz",
+    "author": {
+      "name": "Étienne Deparis",
+      "link": "https://etienne.depar.is"
+    },
+    "aliases": ["Rubocop", "rubocop"]
+  }
+META
+File.write(dash_root + '/docset.json', meta)
+
+puts '>> Copy icons'
+FileUtils.cp '_output/RuboCop.docset/icon.png', dash_root + '/icon.png'
+FileUtils.cp '_output/RuboCop.docset/icon@2x.png', dash_root + '/icon@2x.png'
