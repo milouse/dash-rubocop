@@ -289,7 +289,19 @@ meta = {
   },
   aliases: %w[Rubocop rubocop]
 }
+old_meta = JSON.parse(File.read(dash_root + '/docset.json'))
+old_versions = old_meta.dig('specific_versions') || []
+has_current = old_versions.index { |v| v['version'] == version }
+if has_current.nil?
+  old_versions.unshift({ version: version,
+                         archive: "versions/#{version}/RuboCop.tgz" })
+end
+meta['specific_versions'] = old_versions
 File.write(dash_root + '/docset.json', JSON.pretty_generate(meta))
+FileUtils.mkdir_p("#{dash_root}/versions/#{version}")
+FileUtils.cp(
+  "#{dash_root}/RuboCop.tgz", "#{dash_root}/versions/#{version}/RuboCop.tgz"
+)
 
 puts '>> Copy icons'
 FileUtils.cp '_output/RuboCop.docset/icon.png', dash_root + '/icon.png'
