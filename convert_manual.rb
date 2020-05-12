@@ -153,13 +153,13 @@ plist = <<~PLIST
   <plist version="1.0">
   <dict>
     <key>CFBundleIdentifier</key>
-	  <string>rubocop</string>
-	  <key>CFBundleName</key>
-	  <string>RuboCop</string>
-	  <key>DocSetPlatformFamily</key>
-	  <string>rubocop</string>
-	  <key>isDashDocset</key>
-	  <true/>
+    <string>rubocop</string>
+    <key>CFBundleName</key>
+    <string>RuboCop</string>
+    <key>DocSetPlatformFamily</key>
+    <string>rubocop</string>
+    <key>isDashDocset</key>
+    <true/>
     <key>DashDocSetFamily</key>
     <string>dashtoc</string>
     <key>dashIndexFilePath</key>
