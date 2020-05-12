@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'json'
 require 'sqlite3'
 require 'kramdown'
 require 'nokogiri'
@@ -170,14 +171,12 @@ PLIST
 File.write('_output/RuboCop.docset/Contents/Info.plist', plist)
 
 puts '>> Write meta file'
-meta = <<~META
-  {
-    "name": "RuboCop",
-    "version": "#{version}",
-    "title": "RuboCop"
-  }
-META
-File.write('_output/RuboCop.docset/meta.json', meta)
+File.write(
+  '_output/RuboCop.docset/meta.json',
+  JSON.pretty_generate(
+    { name: 'RuboCop', version: version, title: 'RuboCop' }
+  )
+)
 
 puts '>> Convert icon'
 system('convert', '_output/source/logo/rubo-logo-symbol.png',
@@ -280,19 +279,17 @@ system('tar', '-C', '_output', '--exclude', '.DS_Store', '-czf',
        dash_root + '/RuboCop.tgz', 'RuboCop.docset')
 
 puts '>> Write docset.json file'
-meta = <<~META
-  {
-    "name": "RuboCop",
-    "version": "#{version}",
-    "archive": "RuboCop.tgz",
-    "author": {
-      "name": "Étienne Deparis",
-      "link": "https://etienne.depar.is"
-    },
-    "aliases": ["Rubocop", "rubocop"]
-  }
-META
-File.write(dash_root + '/docset.json', meta)
+meta = {
+  name: 'RuboCop',
+  version: version,
+  archive: 'RuboCop.tgz',
+  author: {
+    name: 'Étienne Deparis',
+    link: 'https://etienne.depar.is'
+  },
+  aliases: %w[Rubocop rubocop]
+}
+File.write(dash_root + '/docset.json', JSON.pretty_generate(meta))
 
 puts '>> Copy icons'
 FileUtils.cp '_output/RuboCop.docset/icon.png', dash_root + '/icon.png'
