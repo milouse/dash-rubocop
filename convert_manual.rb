@@ -304,5 +304,5 @@ FileUtils.cp(
 )
 
 puts '>> Copy icons'
-FileUtils.cp '_output/RuboCop.docset/icon.png', dash_root + '/icon.png'
-FileUtils.cp '_output/RuboCop.docset/icon@2x.png', dash_root + '/icon@2x.png'
+FileUtils.cp '_output/RuboCop.docset/icon.png', "#{dash_root}/icon.png"
+FileUtils.cp '_output/RuboCop.docset/icon@2x.png', "#{dash_root}/icon@2x.png"
