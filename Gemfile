@@ -2,8 +2,7 @@
 
 source 'https://rubygems.org'
 
-gem 'kramdown'
-gem 'kramdown-parser-gfm'
+gem 'asciidoctor'
 gem 'nokogiri'
 gem 'rouge'
 gem 'rubocop'

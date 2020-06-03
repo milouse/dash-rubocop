@@ -2,10 +2,9 @@
 
 require 'json'
 require 'sqlite3'
-require 'kramdown'
 require 'nokogiri'
 require 'fileutils'
-require 'kramdown-parser-gfm'
+require 'asciidoctor'
 
 if ARGV.length != 1
   warn 'Please specify the rubocop target tag'
@@ -13,6 +12,7 @@ if ARGV.length != 1
 end
 
 version = ARGV[0].delete('v')
+inline_version = version.sub(/\.0$/, '')
 
 FileUtils.rm_r '_output' if Dir.exist? '_output'
 
@@ -189,10 +189,6 @@ db = SQLite3::Database.new outdir + '/docSet.dsidx'
 db.execute('CREATE TABLE IF NOT EXISTS searchIndex(id INTEGER PRIMARY KEY, name TEXT, type TEXT, path TEXT);')
 db.execute('CREATE UNIQUE INDEX IF NOT EXISTS anchor ON searchIndex (name, type, path);')
 
-sources = Dir.glob('_output/source/manual/*.md')
-in_sources = sources.map { |f| File.basename(f, '.md') }.sort.join('|')
-link_rx = /\((#{in_sources})\.md/
-
 def entry_type(tag_name, html_file)
   if html_file.start_with?('cops_')
     return 'Category' if tag_name == 'h1'
@@ -206,33 +202,37 @@ end
 
 def insert_tag(db, tag, html_file, entry = nil)
   entry = entry_type(tag.name, html_file) if entry.nil?
-  unless tag.name == 'h1' # For h2 and h3
+  if tag.name == 'h1'
+    uri = html_file
+  else
+    # For h2 and h3
     attr = "//apple_ref/cpp/#{entry}/#{CGI.escape(tag.content)}"
     tag.add_previous_sibling(%(<a name="#{attr}" class="dashAnchor"></a>))
+    uri = html_file + '#' + tag.attribute('id').value
   end
   db.execute(
     'INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?, ?, ?);',
-    tag.content, entry, html_file + '#' + tag.attribute('id').value
+    tag.content, entry, uri
   )
 end
 
-sources.each do |md|
-  basename = File.basename(md, '.md')
+Dir.glob('_output/source/docs/modules/ROOT/pages/*.adoc').each do |adoc|
+  basename = File.basename(adoc, '.adoc')
   html_file = basename + '.html'
-  puts ">> Converting #{md} to #{html_file}"
+  puts ">> Converting #{adoc} to #{html_file}"
 
-  source = File.read(md)
-  source.gsub!(link_rx, '(\1.html')
-
-  html = Kramdown::Document.new(source, input: 'GFM', template: 'document').to_html
-  html.sub!('<html>', "<html><!-- Online page at https://docs.rubocop.org/en/latest/#{basename}/ -->")
-  html.gsub!(%r{(?<!")https://rubystyle.guide#[\w\-]+}, '<a href="\0">\0</a>')
+  source = File.read(adoc)
+  html = Asciidoctor.convert(
+    source,
+    header_footer: true,
+    attributes: %w[source-highlighter=rouge stylesheet=theme.css idprefix]
+  )
+  html.sub!('<html lang="en">', "<html><!-- Online page at https://docs.rubocop.org/rubocop/#{inline_version}/#{html_file} -->")
 
   doc = Nokogiri::HTML(html)
-  doc.css('title').first.add_next_sibling('<link rel="stylesheet" href="theme.css" type="text/css">')
   doc.css('title').first.add_next_sibling('<link rel="shortcut icon" type="image/png" href="../../../icon.png">')
 
-  doc.css('h1[id],h2[id]').each do |tag|
+  doc.css('h1,h2[id]').each do |tag|
     insert_tag(db, tag, html_file)
   end
   unless basename.start_with? 'cops_'
@@ -251,13 +251,13 @@ end
 
 puts '>> Add supplementary settings from configuration.html'
 [
-  { label: 'Include', id: 'includingexcluding-files' },
-  { label: 'Exclude', id: 'includingexcluding-files' },
-  { label: 'TargetRubyVersion', id: 'setting-the-target-ruby-version' },
-  { label: 'StyleGuideBaseURL', id: 'setting-the-style-guide-url'},
-  { label: 'StyleGuide', id: 'setting-the-style-guide-url'},
-  { label: 'inherit_from', id: 'inheriting-from-another-configuration-file-in-the-project' },
-  { label: 'inherit_gem', id: 'inheriting-configuration-from-a-dependency-gem' }
+  { label: 'Include', id: 'includingexcluding_files' },
+  { label: 'Exclude', id: 'includingexcluding_files' },
+  { label: 'TargetRubyVersion', id: 'setting_the_target_ruby_version' },
+  { label: 'StyleGuideBaseURL', id: 'setting_the_style_guide_url'},
+  { label: 'StyleGuide', id: 'setting_the_style_guide_url'},
+  { label: 'inherit_from', id: 'inheriting_from_another_configuration_file_in_the_project' },
+  { label: 'inherit_gem', id: 'inheriting_configuration_from_a_dependency_gem' }
 ].each do |s|
   if s.is_a? String
     attr = s.downcase
@@ -270,6 +270,14 @@ puts '>> Add supplementary settings from configuration.html'
     s, 'Setting', 'configuration.html#' + attr
   )
 end
+db.execute(
+  'INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?, ?, ?);',
+  'NewCops', 'Setting', 'versioning.html#pending_cops'
+)
+db.execute(
+  'INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?, ?, ?);',
+  'require', 'Setting', 'extensions.html#loading_extensions'
+)
 
 dash_root = 'Dash-User-Contributions/docsets/RuboCop'
 exit unless Dir.exist? dash_root
