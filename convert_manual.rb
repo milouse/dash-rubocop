@@ -271,7 +271,7 @@ Dir.glob('_output/source/docs/modules/ROOT/pages/**/*.adoc').each do |adoc|
   write_to_target(doc, outdir, html_file)
 end
 
-puts '>> Add supplementary settings from configuration.html'
+puts '>> Add supplementary settings from various files'
 [
   { label: 'Include', id: 'includingexcluding_files' },
   { label: 'Exclude', id: 'includingexcluding_files' },
@@ -299,6 +299,26 @@ db.execute(
 db.execute(
   'INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?, ?, ?);',
   'require', 'Setting', 'extensions.html#loading_extensions'
+)
+db.execute(
+  'INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?, ?, ?);',
+  'UseCache', 'Setting', 'usage/caching.html#enabling_and_disabling_the_cache'
+)
+db.execute(
+  'INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?, ?, ?);',
+  'CacheRootDirectory', 'Setting', 'usage/caching.html#cache_path'
+)
+db.execute(
+  'INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?, ?, ?);',
+  'MaxFilesInCache', 'Setting', 'usage/caching.html#cache_pruning'
+)
+db.execute(
+  'INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?, ?, ?);',
+  'Safe', 'Setting', 'usage/auto_correct.html#safe_auto_correct'
+)
+db.execute(
+  'INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?, ?, ?);',
+  'SafeAutoCorrect', 'Setting', 'usage/auto_correct.html#safe_auto_correct'
 )
 
 dash_root = 'Dash-User-Contributions/docsets/RuboCop'
