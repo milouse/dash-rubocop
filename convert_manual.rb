@@ -216,9 +216,39 @@ def insert_tag(db, tag, html_file, entry = nil)
   )
 end
 
-Dir.glob('_output/source/docs/modules/ROOT/pages/*.adoc').each do |adoc|
-  basename = File.basename(adoc, '.adoc')
+def extract_h3s(doc, db, basename, html_file)
+  settings = %w[Enabled Severity Details AutoCorrect]
+  doc.css('h3[id]').each do |tag|
+    if basename == 'configuration' && settings.include?(tag.content)
+      insert_tag(db, tag, html_file, 'Setting')
+    else
+      insert_tag(db, tag, html_file)
+    end
+  end
+end
+
+def write_to_target(doc, outdir, html_file)
+  target_file = File.join(outdir, 'Documents', html_file)
+  target_dir = File.dirname(target_file)
+  FileUtils.mkdir_p(target_dir) unless Dir.exist?(target_dir)
+  File.write(target_file, doc.to_html)
+end
+
+def extract_basename_and_html_file(adoc)
+  path, file = File.split(adoc)
+  basename = File.basename(file, '.adoc')
   html_file = basename + '.html'
+  if path != '_output/source/docs/modules/ROOT/pages'
+    html_file = File.join(
+      path.delete_prefix('_output/source/docs/modules/ROOT/pages/'),
+      html_file
+    )
+  end
+  [basename, html_file]
+end
+
+Dir.glob('_output/source/docs/modules/ROOT/pages/**/*.adoc').each do |adoc|
+  basename, html_file = extract_basename_and_html_file(adoc)
   puts ">> Converting #{adoc} to #{html_file}"
 
   source = File.read(adoc)
@@ -235,18 +265,10 @@ Dir.glob('_output/source/docs/modules/ROOT/pages/*.adoc').each do |adoc|
   doc.css('h1,h2[id]').each do |tag|
     insert_tag(db, tag, html_file)
   end
-  unless basename.start_with? 'cops_'
-    settings = %w[Enabled Severity Details AutoCorrect]
-    doc.css('h3[id]').each do |tag|
-      if basename == 'configuration' && settings.include?(tag.content)
-        insert_tag(db, tag, html_file, 'Setting')
-      else
-        insert_tag(db, tag, html_file)
-      end
-    end
-  end
 
-  File.write("#{outdir}/Documents/#{html_file}", doc.to_html)
+  extract_h3s(doc, db, basename, html_file) unless basename.start_with?('cops_')
+
+  write_to_target(doc, outdir, html_file)
 end
 
 puts '>> Add supplementary settings from configuration.html'
