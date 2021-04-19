@@ -2,8 +2,8 @@
 
 source 'https://rubygems.org'
 
-gem 'asciidoctor'
-gem 'nokogiri'
-gem 'rouge'
-gem 'rubocop'
-gem 'sqlite3'
+gem 'asciidoctor', '~> 2.0'
+gem 'nokogiri', '~> 1.11'
+gem 'rouge', '~> 3.26'
+gem 'rubocop', '~> 1.12'
+gem 'sqlite3', '~> 1.4'
