@@ -1,0 +1,47 @@
+---
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.0
+  Exclude:
+  - 'Dash-User-Contributions/**/*'
+  - '_output/**/*'
+
+Layout/EmptyLineAfterGuardClause:
+  Enabled: no
+
+Layout/LineLength:
+  Max: 80
+
+Metrics/AbcSize:
+  Enabled: no
+
+Metrics/BlockLength:
+  Enabled: no
+
+Metrics/MethodLength:
+  Enabled: no
+
+Metrics/ModuleLength:
+  Enabled: no
+
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+Style/Alias:
+  EnforcedStyle: prefer_alias_method
+
+Style/ConditionalAssignment:
+  EnforcedStyle: assign_inside_condition
+
+Style/HashEachMethods:
+  Enabled: yes
+
+Style/HashSyntax:
+  EnforcedStyle: no_mixed_keys
+
+Style/PreferredHashMethods:
+  EnforcedStyle: verbose
+
+Style/RegexpLiteral:
+  EnforcedStyle: slashes
+  AllowInnerSlashes: yes
