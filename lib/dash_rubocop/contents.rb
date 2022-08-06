@@ -120,11 +120,11 @@ module DashRubocop
       )
       @db.execute(
         'INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?, ?, ?);',
-        'Safe', 'Setting', 'usage/auto_correct.html#safe_auto_correct'
+        'Safe', 'Setting', 'usage/autocorrect.html#safe_autocorrect'
       )
       @db.execute(
         'INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?, ?, ?);',
-        'SafeAutoCorrect', 'Setting', 'usage/auto_correct.html#safe_auto_correct'
+        'SafeAutoCorrect', 'Setting', 'usage/autocorrect.html#safe_autocorrect'
       )
     end
     # rubocop:enable Layout/LineLength
