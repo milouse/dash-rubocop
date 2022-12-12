@@ -1,0 +1,3 @@
+[submodule "Dash-User-Contributions"]
+	path = Dash-User-Contributions
+	url = git@github.com:milouse/Dash-User-Contributions.git
